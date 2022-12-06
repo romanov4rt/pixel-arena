@@ -5,9 +5,9 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] float runSpeed = 10f;
-    [SerializeField] float jumpSpeed = 10f;
-    [SerializeField] float climbSpeed = 10f;
+    [SerializeField] private float _runSpeed = 10f;
+    [SerializeField] private float _jumpSpeed = 10f;
+    [SerializeField] private float _climbSpeed = 10f;
     [SerializeField] GameObject spell;
     [SerializeField] Transform hand;
     
@@ -17,7 +17,7 @@ public class PlayerMovement : MonoBehaviour
     CapsuleCollider2D bodyCollider;
     BoxCollider2D feetCollider;
     float gravityScaleAtStart;
-
+    
     bool isAlive = true;
     
     void Start()
@@ -70,7 +70,7 @@ public class PlayerMovement : MonoBehaviour
         if(!feetCollider.IsTouchingLayers(LayerMask.GetMask("Ground"))) {return;}
         if(value.isPressed)
         {
-            rb.velocity += new Vector2(0f, jumpSpeed);
+            rb.velocity += new Vector2(0f, _jumpSpeed);
         }
     }
 
@@ -88,7 +88,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Run()
     {
-        Vector2 playerVelocity = new Vector2 (moveInput.x * runSpeed, rb.velocity.y);
+        Vector2 playerVelocity = new Vector2 (moveInput.x * _runSpeed, rb.velocity.y);
         rb.velocity = playerVelocity;
 
         bool playerHasHorizontalSpeed = Mathf.Abs(rb.velocity.x) > Mathf.Epsilon;
@@ -116,7 +116,7 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        Vector2 climbVelocity = new Vector2 (rb.velocity.x, moveInput.y * climbSpeed);
+        Vector2 climbVelocity = new Vector2 (rb.velocity.x, moveInput.y * _climbSpeed);
         rb.velocity = climbVelocity;
         rb.gravityScale = 0f;
 

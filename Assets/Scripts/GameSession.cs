@@ -7,7 +7,7 @@ using TMPro;
 
 public class GameSession : MonoBehaviour
 {
-    [SerializeField] int playerLives = 3;
+    [SerializeField] private int _playerLives = 3;
 
     [SerializeField] TextMeshProUGUI livesText;
     
@@ -26,12 +26,12 @@ public class GameSession : MonoBehaviour
 
     void Start() 
     {
-        livesText.text = playerLives.ToString();
+        livesText.text = _playerLives.ToString();
     }
 
     public void ProcessPlayerDeath()
     {
-        if (playerLives > 1)
+        if (_playerLives > 1)
         {
             TakeLife();
         }
@@ -43,10 +43,10 @@ public class GameSession : MonoBehaviour
 
     void TakeLife()
     {
-        playerLives--;
+        _playerLives--;
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(currentSceneIndex);
-        livesText.text = playerLives.ToString();        
+        livesText.text = _playerLives.ToString();        
     }
 
     void ResetGameSession()
