@@ -15,9 +15,9 @@ TagManager:
   - Climbing
   - BackGround
   - Bouncing
-  - 
-  - 
-  - 
+  - Enemy
+  - Hazards
+  - Spell
   - 
   - 
   - 
@@ -47,11 +47,20 @@ TagManager:
   - name: Platforms
     uniqueID: 2437556343
     locked: 0
-  - name: Player
-    uniqueID: 349159853
-    locked: 0
   - name: Climbing
     uniqueID: 1543434561
+    locked: 0
+  - name: Hazards
+    uniqueID: 222814157
+    locked: 0
+  - name: Enemies
+    uniqueID: 3473056795
+    locked: 0
+  - name: Spell
+    uniqueID: 685032931
+    locked: 0
+  - name: Player
+    uniqueID: 349159853
     locked: 0
   - name: Water
     uniqueID: 1057121495

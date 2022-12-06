@@ -5,100 +5,123 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] float _runSpeed = 10f;
-    [SerializeField] float _jumpSpeed = 5f;
-    [SerializeField] float _climbSpeed = 10f;
+    [SerializeField] float runSpeed = 10f;
+    [SerializeField] float jumpSpeed = 10f;
+    [SerializeField] float climbSpeed = 10f;
+    [SerializeField] GameObject spell;
+    [SerializeField] Transform hand;
     
-    Vector2 _moveInput;
-    Rigidbody2D _rb;
-    Animator _anim;
-    CapsuleCollider2D _bodyCollider;
-    BoxCollider2D _feetCollider;
+    Vector2 moveInput;
+    Rigidbody2D rb;
+    Animator anim;
+    CapsuleCollider2D bodyCollider;
+    BoxCollider2D feetCollider;
+    float gravityScaleAtStart;
 
-    float _gravityScaleAtStart;
+    bool isAlive = true;
     
     void Start()
     {
-        _rb = GetComponent<Rigidbody2D>();
-        _anim = GetComponent<Animator>();
-        _bodyCollider = GetComponent<CapsuleCollider2D>();
-        _feetCollider = GetComponent<BoxCollider2D>();
-        _gravityScaleAtStart = _rb.gravityScale;
+        rb = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
+        bodyCollider = GetComponent<CapsuleCollider2D>();
+        feetCollider = GetComponent<BoxCollider2D>();
+        gravityScaleAtStart = rb.gravityScale;
     }
 
     void Update()
     {
+        if(!isAlive) {return;}
         Run();
         FlipSprite();
         isJumping();
         ClimbLadder();
+        Die();
     }
 
-    void OnMove(InputValue value)
+    void Die()
     {
-        _moveInput = value.Get<Vector2>();
+        if(bodyCollider.IsTouchingLayers(LayerMask.GetMask("Enemy", "Hazards")))
+        {
+            isAlive = false;            
+            rb.mass += 100;
+            rb.constraints = RigidbodyConstraints2D.FreezePositionX; 
+            anim.SetTrigger("dying");
+            FindObjectOfType<GameSession>().ProcessPlayerDeath();
+        }
+    }
+
+    // void OnSpell1(InputValue value)
+    // {
+    //     if(!isAlive) {return;}
+    //     anim.SetTrigger("skill1"); 
+    //     anim.SetTrigger("skill1fx");
+    // }
+
+    void OnMove(InputValue value)
+    {   
+        if(!isAlive) {return;}
+        moveInput = value.Get<Vector2>();
     }
 
     void OnJump(InputValue value)
     {
-        if(!_feetCollider.IsTouchingLayers(LayerMask.GetMask("Ground")))
-        {
-            return;
-        }
+        if(!isAlive) {return;}
+        if(!feetCollider.IsTouchingLayers(LayerMask.GetMask("Ground"))) {return;}
         if(value.isPressed)
         {
-            _rb.velocity += new Vector2(0f, _jumpSpeed);
+            rb.velocity += new Vector2(0f, jumpSpeed);
         }
     }
 
     void isJumping()
     {
-        if(!_feetCollider.IsTouchingLayers(LayerMask.GetMask("Ground")))
+        if(!feetCollider.IsTouchingLayers(LayerMask.GetMask("Ground")))
         {
-            _anim.SetBool("isJumping", true);
+            anim.SetBool("isJumping", true);
         }
         else
         {
-            _anim.SetBool("isJumping", false);
+            anim.SetBool("isJumping", false);
         }
     }
 
     void Run()
     {
-        Vector2 playerVelocity = new Vector2 (_moveInput.x * _runSpeed, _rb.velocity.y);
-        _rb.velocity = playerVelocity;
+        Vector2 playerVelocity = new Vector2 (moveInput.x * runSpeed, rb.velocity.y);
+        rb.velocity = playerVelocity;
 
-        bool playerHasHorizontalSpeed = Mathf.Abs(_rb.velocity.x) > Mathf.Epsilon;
-        _anim.SetBool("isRunning", playerHasHorizontalSpeed);
+        bool playerHasHorizontalSpeed = Mathf.Abs(rb.velocity.x) > Mathf.Epsilon;
+        anim.SetBool("isRunning", playerHasHorizontalSpeed);
 
     }
 
     void FlipSprite()
     {
-        bool playerHasHorizontalSpeed = Mathf.Abs(_rb.velocity.x) > Mathf.Epsilon;
+        bool playerHasHorizontalSpeed = Mathf.Abs(rb.velocity.x) > Mathf.Epsilon;
 
         if (playerHasHorizontalSpeed)
         {
-            transform.localScale = new Vector2 (Mathf.Sign(_rb.velocity.x), 1f);
+            transform.localScale = new Vector2 (Mathf.Sign(rb.velocity.x), 1f);
         }
     }
 
     void ClimbLadder()
     {
         
-        if(!_feetCollider.IsTouchingLayers(LayerMask.GetMask("Climbing")))
+        if(!feetCollider.IsTouchingLayers(LayerMask.GetMask("Climbing")))
         {
-            _rb.gravityScale = _gravityScaleAtStart;
-            _anim.SetBool("isClimbing", true);
+            rb.gravityScale = gravityScaleAtStart;
+            anim.SetBool("isClimbing", true);
             return;
         }
 
-        Vector2 climbVelocity = new Vector2 (_rb.velocity.x, _moveInput.y * _climbSpeed);
-        _rb.velocity = climbVelocity;
-        _rb.gravityScale = 0f;
+        Vector2 climbVelocity = new Vector2 (rb.velocity.x, moveInput.y * climbSpeed);
+        rb.velocity = climbVelocity;
+        rb.gravityScale = 0f;
 
-        bool playerHasVerticalSpeed = Mathf.Abs(_rb.velocity.y) > Mathf.Epsilon;
-        _anim.SetBool("isClimbing",playerHasVerticalSpeed);
+        bool playerHasVerticalSpeed = Mathf.Abs(rb.velocity.y) > Mathf.Epsilon;
+        anim.SetBool("isClimbing",playerHasVerticalSpeed);
     }
 }
 
